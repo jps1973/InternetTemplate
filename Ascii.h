@@ -12,6 +12,7 @@
 #define ASCII_CLOSE_CURLY_BRACKET_CHARACTER										'}'
 #define ASCII_CLOSE_SQUARE_BRACKET_CHARACTER									']'
 #define ASCII_COLON_CHARACTER													':'
+#define ASCII_COMMA_CHARACTER													','
 #define ASCII_DOLLAR_CHARACTER													'$'
 #define ASCII_EQUALS_CHARACTER													'='
 #define ASCII_EXCLAMATION_MARK_CHARACTER										'!'
