@@ -2,6 +2,24 @@
 
 #include "InternetTemplate.h"
 
+BOOL ProcessTagFunction( LPTSTR lpszTag )
+{
+	BOOL bResult = FALSE;
+
+	// Add tag to list box window
+	if( ListBoxWindowAddString( lpszTag ) >= 0 )
+	{
+		// Successfully added tag to list box window
+
+		// Update return value
+		bResult = TRUE;
+
+	} // End of successfully added tag to list box window
+
+	return bResult;
+
+} // End of function 
+
 void EditWindowUpdateFunction( int nTextLength )
 {
 	// See if edit window contains text
@@ -24,19 +42,19 @@ void EditWindowUpdateFunction( int nTextLength )
 
 } // End of function EditWindowUpdateFunction
 
-void DoubleClickFunction( LPCTSTR lpszItemText )
+void ListBoxWindowDoubleClickFunction( LPCTSTR lpszItemText )
 {
 	// Display item text
 	MessageBox( NULL, lpszItemText, INFORMATION_MESSAGE_CAPTION, ( MB_OK | MB_ICONINFORMATION ) );
 
-} // End of function DoubleClickFunction
+} // End of function ListBoxWindowDoubleClickFunction
 
-void SelectionChangedFunction( LPCTSTR lpszItemText )
+void ListBoxWindowSelectionChangedFunction( LPCTSTR lpszItemText )
 {
 	// Show item text on status bar window
 	StatusBarWindowSetText( lpszItemText );
 
-} // End of function SelectionChangedFunction
+} // End of function ListBoxWindowSelectionChangedFunction
 
 int ShowAboutMessage( HWND hWndParent )
 {
@@ -277,6 +295,8 @@ LRESULT CALLBACK MainWndProc( HWND hWndMain, UINT uMessage, WPARAM wParam, LPARA
 							{
 								// Successfully read html file
 
+								// Process tags in html file
+								HtmlFileProcessTags( &ProcessTagFunction );
 
 								// Free memory associated with html file
 								HtmlFileFreeMemory();
@@ -359,7 +379,7 @@ LRESULT CALLBACK MainWndProc( HWND hWndMain, UINT uMessage, WPARAM wParam, LPARA
 						// Command message is from list box window
 
 						// Handle command message from list box window
-						if( !( ListBoxWindowHandleCommandMessage( wParam, lParam, &DoubleClickFunction, &SelectionChangedFunction ) ) )
+						if( !( ListBoxWindowHandleCommandMessage( wParam, lParam, &ListBoxWindowDoubleClickFunction, &ListBoxWindowSelectionChangedFunction ) ) )
 						{
 							// Command message was not handled from list box window
 
