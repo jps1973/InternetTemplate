@@ -6,6 +6,7 @@
 #include "Common.h"
 #include "Resource.h"
 
+#include "Clipboard.h"
 #include "HtmlFile.h"
 #include "Internet.h"
 

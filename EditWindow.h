@@ -16,7 +16,7 @@
 
 BOOL IsEditWindow( HWND hWnd );
 
-BOOL EditWindowCreate( HWND hWndParent, HINSTANCE hInstance );
+BOOL EditWindowCreate( HWND hWndParent, HINSTANCE hInstance, LPCTSTR lpszEditWindowText = EDIT_WINDOW_TEXT );
 
 BOOL EditWindowGetRect( LPRECT lpRect );
 

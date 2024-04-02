@@ -93,6 +93,49 @@ LRESULT CALLBACK MainWndProc( HWND hWndMain, UINT uMessage, WPARAM wParam, LPARA
 			// A create message
 			HINSTANCE hInstance;
 			HFONT hFont;
+			DWORD dwClipboardTextLength;
+
+			// Allocate string memory
+			LPTSTR lpszInitialUrl = new char[ STRING_LENGTH + sizeof( char ) ];
+
+			// Get clipboard text length
+			dwClipboardTextLength = ClipboardGetTextLength();
+
+			// See if clipboard contains text
+			if( dwClipboardTextLength > 0 )
+			{
+				// Clipboard contains text
+
+				// Allocate string memory
+				LPTSTR lpszClipboardText = new char[ dwClipboardTextLength + sizeof( char ) ];
+
+				// Get clipboard text
+				if( ClipboardGetText( lpszClipboardText ) )
+				{
+					// Successfully got clipboard text
+
+					// Use clipboard text as initial url
+					lstrcpyn( lpszInitialUrl, lpszClipboardText, STRING_LENGTH );
+
+				} // End of successfully got clipboard text
+				else
+				{
+					// Unable to get clipboard text
+
+					// Use default initial url
+					lstrcpy( lpszInitialUrl, EDIT_WINDOW_TEXT );
+
+				} // End of unable to get clipboard text
+
+			} // End of clipboard contains text
+			else
+			{
+				// Clipboard is empty
+
+				// Use default initial url
+				lstrcpy( lpszInitialUrl, EDIT_WINDOW_TEXT );
+
+			} // End of clipboard is empty
 
 			// Get instance
 			hInstance = ( ( LPCREATESTRUCT )lParam )->hInstance;
@@ -101,7 +144,7 @@ LRESULT CALLBACK MainWndProc( HWND hWndMain, UINT uMessage, WPARAM wParam, LPARA
 			hFont = ( HFONT )GetStockObject( DEFAULT_GUI_FONT );
 
 			// Create edit window
-			if( EditWindowCreate( hWndMain, hInstance ) )
+			if( EditWindowCreate( hWndMain, hInstance, lpszInitialUrl ) )
 			{
 				// Successfully created edit window
 
@@ -142,6 +185,9 @@ LRESULT CALLBACK MainWndProc( HWND hWndMain, UINT uMessage, WPARAM wParam, LPARA
 				} // End of successfully created list box window
 
 			} // End of successfully created edit window
+
+			// Free string memory
+			delete [] lpszInitialUrl;
 
 			// Break out of switch
 			break;
