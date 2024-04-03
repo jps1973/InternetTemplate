@@ -41,5 +41,7 @@
 																				"\r\n"								\
 																				"March 2024"
 
+#define DEFAULT_INITIAL_URL														"https://www.google.com"
+
 #define UNABLE_TO_REGISTER_MAIN_WINDOW_CLASS_ERROR_MESSAGE						"Unable to Register Main Window Class"
 #define UNABLE_TO_CREATE_MAIN_WINDOW_ERROR_MESSAGE								"Unable to Create Main Window"

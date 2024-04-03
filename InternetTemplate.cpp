@@ -93,49 +93,6 @@ LRESULT CALLBACK MainWndProc( HWND hWndMain, UINT uMessage, WPARAM wParam, LPARA
 			// A create message
 			HINSTANCE hInstance;
 			HFONT hFont;
-			DWORD dwClipboardTextLength;
-
-			// Allocate string memory
-			LPTSTR lpszInitialUrl = new char[ STRING_LENGTH + sizeof( char ) ];
-
-			// Get clipboard text length
-			dwClipboardTextLength = ClipboardGetTextLength();
-
-			// See if clipboard contains text
-			if( dwClipboardTextLength > 0 )
-			{
-				// Clipboard contains text
-
-				// Allocate string memory
-				LPTSTR lpszClipboardText = new char[ dwClipboardTextLength + sizeof( char ) ];
-
-				// Get clipboard text
-				if( ClipboardGetText( lpszClipboardText ) )
-				{
-					// Successfully got clipboard text
-
-					// Use clipboard text as initial url
-					lstrcpyn( lpszInitialUrl, lpszClipboardText, STRING_LENGTH );
-
-				} // End of successfully got clipboard text
-				else
-				{
-					// Unable to get clipboard text
-
-					// Use default initial url
-					lstrcpy( lpszInitialUrl, EDIT_WINDOW_TEXT );
-
-				} // End of unable to get clipboard text
-
-			} // End of clipboard contains text
-			else
-			{
-				// Clipboard is empty
-
-				// Use default initial url
-				lstrcpy( lpszInitialUrl, EDIT_WINDOW_TEXT );
-
-			} // End of clipboard is empty
 
 			// Get instance
 			hInstance = ( ( LPCREATESTRUCT )lParam )->hInstance;
@@ -144,7 +101,7 @@ LRESULT CALLBACK MainWndProc( HWND hWndMain, UINT uMessage, WPARAM wParam, LPARA
 			hFont = ( HFONT )GetStockObject( DEFAULT_GUI_FONT );
 
 			// Create edit window
-			if( EditWindowCreate( hWndMain, hInstance, lpszInitialUrl ) )
+			if( EditWindowCreate( hWndMain, hInstance ) )
 			{
 				// Successfully created edit window
 
@@ -175,9 +132,6 @@ LRESULT CALLBACK MainWndProc( HWND hWndMain, UINT uMessage, WPARAM wParam, LPARA
 							// Set status bar window font
 							StatusBarWindowSetFont( hFont );
 
-							// Select edit window text
-							EditWindowSelect();
-
 						} // End of successfully created status bar window
 
 					} // End of successfully created list box window
@@ -185,9 +139,6 @@ LRESULT CALLBACK MainWndProc( HWND hWndMain, UINT uMessage, WPARAM wParam, LPARA
 				} // End of successfully created list box window
 
 			} // End of successfully created edit window
-
-			// Free string memory
-			delete [] lpszInitialUrl;
 
 			// Break out of switch
 			break;
@@ -591,6 +542,12 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow )
 				LPWSTR *lpszArgumentList;
 				int nArgumentCount;
 
+				// Allocate string memory
+				LPTSTR lpszInitialUrl = new char[ STRING_LENGTH + sizeof( char ) ];
+
+				// Clear initial url
+				lpszInitialUrl[ 0 ] = ( char )NULL;
+
 				// Get system menu
 				hMenuSystem = GetSystemMenu( hWndMain, FALSE );
 
@@ -607,37 +564,82 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow )
 				if( lpszArgumentList )
 				{
 					// Successfully got argument list
-					int nWhichArgument;
-					int nSizeNeeded;
-					int nWideArgumentLength;
 
-					// Allocate string memory
-					LPTSTR lpszArgument = new char[ STRING_LENGTH ];
-
-					// Loop through arguments
-					for( nWhichArgument = 1; nWhichArgument < nArgumentCount; nWhichArgument ++ )
+					// See if arguments were provided
+					if( nArgumentCount > 1 )
 					{
-						// Get wide argument length
-						nWideArgumentLength = lstrlenW( lpszArgumentList[ nWhichArgument ] );
+						// At least one argument was provided
+						int nSizeNeeded;
+						int nWideArgumentLength;
 
-						// Get size required for argument
-						nSizeNeeded = WideCharToMultiByte( CP_UTF8, 0, lpszArgumentList[ nWhichArgument ], nWideArgumentLength, NULL, 0, NULL, NULL );
+						// Get wide first argument length
+						nWideArgumentLength = lstrlenW( lpszArgumentList[ 1 ] );
 
-						// Convert argument to ansi
-						WideCharToMultiByte( CP_UTF8, 0, lpszArgumentList[ nWhichArgument ], nWideArgumentLength, lpszArgument, nSizeNeeded, NULL, NULL );
+						// Get size required for first argument
+						nSizeNeeded = WideCharToMultiByte( CP_UTF8, 0, lpszArgumentList[ 1 ], nWideArgumentLength, NULL, 0, NULL, NULL );
 
-						// Terminate argument
-						lpszArgument[ nSizeNeeded ] = ( char )NULL;
+						// Convert first argument to ansi, and use as initial url
+						WideCharToMultiByte( CP_UTF8, 0, lpszArgumentList[ 1 ], nWideArgumentLength, lpszInitialUrl, nSizeNeeded, NULL, NULL );
 
-						// Add argument to list box window
-						ListBoxWindowAddString( lpszArgument );
+						// Terminate initial url
+						lpszInitialUrl[ nSizeNeeded ] = ( char )NULL;
 
-					}; // End of loop through arguments
-
-					// Free string memory
-					delete [] lpszArgument;
+					}; // End of at least one argument was provided
 
 				} // End of successfully got argument list
+
+				// See if initial url is empty
+				if( !( lpszInitialUrl[ 0 ] ) )
+				{
+					// Initial url is empty
+					DWORD dwClipboardTextLength;
+
+					// Get clipboard text length
+					dwClipboardTextLength = ClipboardGetTextLength();
+
+					// See if clipboard contains text
+					if( dwClipboardTextLength > 0 )
+					{
+						// Clipboard contains text
+
+						// Allocate string memory
+						LPTSTR lpszClipboardText = new char[ dwClipboardTextLength + sizeof( char ) ];
+
+						// Get clipboard text
+						if( ClipboardGetText( lpszClipboardText ) )
+						{
+							// Successfully got clipboard text
+
+							// Use clipboard text as initial url
+							lstrcpyn( lpszInitialUrl, lpszClipboardText, STRING_LENGTH );
+
+						} // End of successfully got clipboard text
+						else
+						{
+							// Unable to get clipboard text
+
+							// Use default initial url
+							lstrcpy( lpszInitialUrl, DEFAULT_INITIAL_URL );
+
+						} // End of unable to get clipboard text
+
+					} // End of clipboard contains text
+					else
+					{
+						// Clipboard is empty
+
+						// Use default initial url
+						lstrcpy( lpszInitialUrl, DEFAULT_INITIAL_URL );
+
+					} // End of clipboard is empty
+
+				} // End of initial url is empty
+
+				// Show initial url on edit window
+				EditWindowSetText( lpszInitialUrl );
+
+				// Select edit window text
+				EditWindowSelect();
 
 				// Show main window
 				ShowWindow( hWndMain, nCmdShow );
@@ -655,6 +657,9 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow )
 					DispatchMessage( &msg );
 
 				}; // End of main message loop
+
+				// Free string memory
+				delete [] lpszInitialUrl;
 
 			} // End of successfully created main window
 			else

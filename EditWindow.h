@@ -12,11 +12,11 @@
 
 #define EDIT_WINDOW_EXTENDED_STYLE												0
 #define EDIT_WINDOW_STYLE														( WS_CHILD | WS_VISIBLE | WS_BORDER )
-#define EDIT_WINDOW_TEXT														"https://www.google.com"
+#define EDIT_WINDOW_TEXT														NULL
 
 BOOL IsEditWindow( HWND hWnd );
 
-BOOL EditWindowCreate( HWND hWndParent, HINSTANCE hInstance, LPCTSTR lpszEditWindowText = EDIT_WINDOW_TEXT );
+BOOL EditWindowCreate( HWND hWndParent, HINSTANCE hInstance );
 
 BOOL EditWindowGetRect( LPRECT lpRect );
 
@@ -31,3 +31,5 @@ HWND EditWindowSetFocus();
 void EditWindowSelect( int nStart = 0, int nEnd = -1 );
 
 void EditWindowSetFont( HFONT hFont );
+
+int EditWindowSetText( LPTSTR lpszText );

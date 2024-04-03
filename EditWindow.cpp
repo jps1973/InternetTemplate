@@ -12,12 +12,12 @@ BOOL IsEditWindow( HWND hWnd )
 
 } // End of function IsEditWindow
 
-BOOL EditWindowCreate( HWND hWndParent, HINSTANCE hInstance, LPCTSTR lpszEditWindowText )
+BOOL EditWindowCreate( HWND hWndParent, HINSTANCE hInstance )
 {
 	BOOL bResult = FALSE;
 
 	// Create edit window
-	g_hWndEdit = ::CreateWindowEx( EDIT_WINDOW_EXTENDED_STYLE, EDIT_WINDOW_CLASS_NAME, lpszEditWindowText, EDIT_WINDOW_STYLE, 0, 0, 0, 0, hWndParent, ( HMENU )NULL, hInstance, NULL );
+	g_hWndEdit = ::CreateWindowEx( EDIT_WINDOW_EXTENDED_STYLE, EDIT_WINDOW_CLASS_NAME, EDIT_WINDOW_TEXT, EDIT_WINDOW_STYLE, 0, 0, 0, 0, hWndParent, ( HMENU )NULL, hInstance, NULL );
 
 	// Ensure that edit window was created
 	if( g_hWndEdit )
@@ -112,3 +112,10 @@ void EditWindowSetFont( HFONT hFont )
 	::SendMessage( g_hWndEdit, WM_SETFONT, ( WPARAM )hFont, ( LPARAM )TRUE );
 
 } // End of function EditWindowSetFont
+
+int EditWindowSetText( LPTSTR lpszText )
+{
+	// Set edit window text
+	return ::SetWindowText( g_hWndEdit, lpszText );
+
+} // End of function EditWindowSetText
