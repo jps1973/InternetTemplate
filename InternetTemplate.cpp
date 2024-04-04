@@ -272,15 +272,22 @@ LRESULT CALLBACK MainWndProc( HWND hWndMain, UINT uMessage, WPARAM wParam, LPARA
 					// A button window command
 
 					// Allocate string memory
-					LPTSTR lpszUrl = new char[ STRING_LENGTH ];
+					LPTSTR lpszUrl				= new char[ STRING_LENGTH ];
+					LPTSTR lpszStatusMessage	= new char[ STRING_LENGTH ];
 
 					// Get url from edit window
 					if( EditWindowGetText( lpszUrl ) )
 					{
 						// Successfully got url from edit window
 
-						// Allocate strinf memory
+						// Allocate string memory
 						LPTSTR lpszLocalFilePath = new char[ STRING_LENGTH ];
+
+						// Format status message
+						wsprintf( lpszStatusMessage, INTERNET_DOWNLOADING_STATUS_MESSAGE_FORMAT_STRING, lpszUrl );
+
+						// Show status message on status bar window
+						StatusBarWindowSetText( lpszStatusMessage );
 
 						// Download file
 						if( InternetDownloadFile( lpszUrl, lpszLocalFilePath ) )
@@ -295,34 +302,48 @@ LRESULT CALLBACK MainWndProc( HWND hWndMain, UINT uMessage, WPARAM wParam, LPARA
 								// Process tags in html file
 								HtmlFileProcessTags( &ProcessTagFunction );
 
+								// Format status message
+								wsprintf( lpszStatusMessage, INTERNET_SUCCESSFULLY_DOWNLOADED_STATUS_MESSAGE_FORMAT_STRING, lpszUrl, lpszLocalFilePath );
+
 								// Free memory associated with html file
 								HtmlFileFreeMemory();
 
 							} // End of successfully read html file
+							else
+							{
+								// Unable to read html file
+
+								// Format status message
+								wsprintf( lpszStatusMessage, HTML_FILE_UNABLE_TO_READ_ERROR_MESSAGE_FORMAT_STRING, lpszLocalFilePath );
+
+							} // End of unable to read html file
 
 						} // End of successfully downloaded file
 						else
 						{
-							// Unable to donload file
+							// Unable to download file
 
-							// Allocate string memory
-							LPTSTR lpszErrorMessage = new char[ STRING_LENGTH ];
+							// Format status message
+							wsprintf( lpszStatusMessage, INTERNET_UNABLE_TO_DOWNLOAD_FILE_ERROR_MESSAGE_FORMAT_STRING, lpszUrl );
 
-							// Format error message
-							wsprintf( lpszErrorMessage, INTERNET_UNABLE_TO_DOWNLOAD_FILE_ERROR_MESSAGE_FORMAT_STRING, lpszUrl );
-
-							// Display error message
-							MessageBox( NULL, lpszErrorMessage, ERROR_MESSAGE_CAPTION, ( MB_OK | MB_ICONERROR ) );
-
-							// Free string memory
-							delete [] lpszErrorMessage;
-
-						} // End of unable to connect to internet
+						} // End of unable to download file
 
 					} // End of successfully got url from edit window
+					else
+					{
+						// Unable to get url from edit window
+
+						// Update status message
+						lstrcpy( lpszStatusMessage, UNABLE_TO_GET_URL_FROM_EDIT_WINDOW_ERROR_MESSAGE );
+
+					} // End of unable to get url from edit window
+
+					// Show status message on status bar window
+					StatusBarWindowSetText( lpszStatusMessage );
 
 					// Free string memory
 					delete [] lpszUrl;
+					delete [] lpszStatusMessage;
 
 					// Break out of switch
 					break;

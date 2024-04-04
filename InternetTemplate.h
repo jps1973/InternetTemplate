@@ -43,5 +43,7 @@
 
 #define DEFAULT_INITIAL_URL														"https://www.google.com"
 
+#define UNABLE_TO_GET_URL_FROM_EDIT_WINDOW_ERROR_MESSAGE						"Unable to get url from edit window"
+
 #define UNABLE_TO_REGISTER_MAIN_WINDOW_CLASS_ERROR_MESSAGE						"Unable to Register Main Window Class"
 #define UNABLE_TO_CREATE_MAIN_WINDOW_ERROR_MESSAGE								"Unable to Create Main Window"

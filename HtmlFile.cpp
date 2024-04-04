@@ -197,9 +197,6 @@ BOOL HtmlFileRead( LPCTSTR lpszFilePath )
 				// Terminate file text
 				g_lpszFileText[dwFileSize] = ( char )NULL;
 
-				// Display file text
-				MessageBox( NULL, g_lpszFileText, lpszFilePath, ( MB_OK | MB_ICONINFORMATION ) );
-
 				// Update return value
 				bResult = TRUE;
 
