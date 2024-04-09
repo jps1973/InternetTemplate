@@ -41,7 +41,7 @@
 																				"\r\n"								\
 																				"March 2024"
 
-#define DEFAULT_INITIAL_URL														"https://www.google.com"
+#define DEFAULT_INITIAL_URL														"https://news.sky.com/uk"
 
 #define UNABLE_TO_GET_URL_FROM_EDIT_WINDOW_ERROR_MESSAGE						"Unable to get url from edit window"
 

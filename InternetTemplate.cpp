@@ -2,19 +2,55 @@
 
 #include "InternetTemplate.h"
 
+// Global variables
+LPTSTR g_lpszParentUrl;
+
 BOOL ProcessTagFunction( LPTSTR lpszTag )
 {
 	BOOL bResult = FALSE;
 
-	// Add tag to list box window
-	if( ListBoxWindowAddString( lpszTag ) >= 0 )
+	// Allocate string memory
+	LPTSTR lpszTagName = new char[ STRING_LENGTH ];
+
+	// Get tag name
+	if( HtmlFileGetTagName( lpszTag, lpszTagName ) )
 	{
-		// Successfully added tag to list box window
+		// Successfully got tag name
 
-		// Update return value
-		bResult = TRUE;
+		// See if tag is an image
+		if( lstrcmpi( lpszTagName, HTML_FILE_IMAGE_TAG_NAME ) == 0 )
+		{
+			// Tag is an image
 
-	} // End of successfully added tag to list box window
+			// Allocate string memory
+			LPTSTR lpszAttributeValue = new char[ STRING_LENGTH ];
+
+			// Get attribute value
+			if( HtmlFileGetAttributeValue( lpszTag, g_lpszParentUrl, HTML_FILE_IMAGE_TAG_ATTRIBUTE_NAME, lpszAttributeValue ) )
+			{
+				// Successfully got attribute value
+
+				// Add attribute to list box window
+				if( ListBoxWindowAddString( lpszAttributeValue ) >= 0 )
+				{
+					// Successfully added attribute to list box window
+
+					// Update return value
+					bResult = TRUE;
+
+				} // End of successfully added attribute to list box window
+
+			} // End of successfully got attribute value
+
+			// Free string memory
+			delete [] lpszAttributeValue;
+
+		} // End of tag is an image
+
+	} // End of successfully got tag name
+
+	// Free string memory
+	delete [] lpszTagName;
 
 	return bResult;
 
@@ -272,11 +308,10 @@ LRESULT CALLBACK MainWndProc( HWND hWndMain, UINT uMessage, WPARAM wParam, LPARA
 					// A button window command
 
 					// Allocate string memory
-					LPTSTR lpszUrl				= new char[ STRING_LENGTH ];
-					LPTSTR lpszStatusMessage	= new char[ STRING_LENGTH ];
+					LPTSTR lpszStatusMessage = new char[ STRING_LENGTH ];
 
 					// Get url from edit window
-					if( EditWindowGetText( lpszUrl ) )
+					if( EditWindowGetText( g_lpszParentUrl ) )
 					{
 						// Successfully got url from edit window
 
@@ -284,13 +319,13 @@ LRESULT CALLBACK MainWndProc( HWND hWndMain, UINT uMessage, WPARAM wParam, LPARA
 						LPTSTR lpszLocalFilePath = new char[ STRING_LENGTH ];
 
 						// Format status message
-						wsprintf( lpszStatusMessage, INTERNET_DOWNLOADING_STATUS_MESSAGE_FORMAT_STRING, lpszUrl );
+						wsprintf( lpszStatusMessage, INTERNET_DOWNLOADING_STATUS_MESSAGE_FORMAT_STRING, g_lpszParentUrl );
 
 						// Show status message on status bar window
 						StatusBarWindowSetText( lpszStatusMessage );
 
 						// Download file
-						if( InternetDownloadFile( lpszUrl, lpszLocalFilePath ) )
+						if( InternetDownloadFile( g_lpszParentUrl, lpszLocalFilePath ) )
 						{
 							// Successfully downloaded file
 
@@ -303,7 +338,7 @@ LRESULT CALLBACK MainWndProc( HWND hWndMain, UINT uMessage, WPARAM wParam, LPARA
 								HtmlFileProcessTags( &ProcessTagFunction );
 
 								// Format status message
-								wsprintf( lpszStatusMessage, INTERNET_SUCCESSFULLY_DOWNLOADED_STATUS_MESSAGE_FORMAT_STRING, lpszUrl, lpszLocalFilePath );
+								wsprintf( lpszStatusMessage, INTERNET_SUCCESSFULLY_DOWNLOADED_STATUS_MESSAGE_FORMAT_STRING, g_lpszParentUrl, lpszLocalFilePath );
 
 								// Free memory associated with html file
 								HtmlFileFreeMemory();
@@ -324,7 +359,7 @@ LRESULT CALLBACK MainWndProc( HWND hWndMain, UINT uMessage, WPARAM wParam, LPARA
 							// Unable to download file
 
 							// Format status message
-							wsprintf( lpszStatusMessage, INTERNET_UNABLE_TO_DOWNLOAD_FILE_ERROR_MESSAGE_FORMAT_STRING, lpszUrl );
+							wsprintf( lpszStatusMessage, INTERNET_UNABLE_TO_DOWNLOAD_FILE_ERROR_MESSAGE_FORMAT_STRING, g_lpszParentUrl );
 
 						} // End of unable to download file
 
@@ -342,7 +377,6 @@ LRESULT CALLBACK MainWndProc( HWND hWndMain, UINT uMessage, WPARAM wParam, LPARA
 					StatusBarWindowSetText( lpszStatusMessage );
 
 					// Free string memory
-					delete [] lpszUrl;
 					delete [] lpszStatusMessage;
 
 					// Break out of switch
@@ -524,6 +558,12 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow )
 
 	// Clear message structure
 	ZeroMemory( &msg, sizeof( msg ) );
+
+	// Allocate global memory
+	g_lpszParentUrl = new char[ STRING_LENGTH ];
+
+	// Clear parent url
+	g_lpszParentUrl[ 0 ] = ( char )NULL;
 
 	// Connect to internet
 	if( InternetConnect() )
@@ -714,6 +754,9 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow )
 		MessageBox( NULL, INTERNET_UNABLE_TO_CONNECT_INTERNET_ERROR_MESSAGE, ERROR_MESSAGE_CAPTION, ( MB_OK | MB_ICONERROR ) );
 
 	} // End of unable to connect to internet
+
+	// Free global memory
+	delete [] g_lpszParentUrl;
 
 	return msg.wParam;
 
